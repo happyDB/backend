@@ -1,6 +1,17 @@
 var express = require('express');
 const session = require('express-session');
 var router = express.Router();
+var myDatabase = require('../db/db_conn');
+var connection = myDatabase.init();
+
+
+connection.connect(function (err) {   
+    if (err) {     
+      console.error('mysql connection error');     
+      console.error(err);     
+      throw err;   
+    } 
+});
 
 router.use(session({
     key: 'sid',
@@ -32,11 +43,21 @@ router.post("/api/login",function(req,res,err){
         pwd: req.body.pwd,
     };
    
-            if(loginData.id == userInfo.id && loginData.pwd == userInfo.pwd){
+        connection.query(`SELECT Member_ID, Name, Password, Authority FROM HappyBoardGame.MEMBER WHERE Name='${userInfo.id}'`,
+        function(err,results){
+            if (results != ""){
+                console.log(results);
+                var rows = JSON.parse(JSON.stringify(results[0]));
+            
+            //let salt = Math.round((new Date().valueOf() * Math.random())) + "";
+          //  let hashPassword = crypto.createHash("sha512").update(userInfo.pwd + rows.salt).digest("hex");
+            console.log(rows.Member_ID, rows.Password);
+            if(rows.Name == userInfo.id && userInfo.pwd == rows.Password){
                 console.log("로그인 성공");
                 sess.logined = true;
-                sess.name = userInfo.id;
-                sess.nickname = loginData.nickname;
+                sess.id = rows.Member_ID;
+                sess.nickname = rows.Name;
+                sess.authority=rows.Authority;
                 console.log(sess);
                 res.send(sess);
             }
@@ -44,7 +65,16 @@ router.post("/api/login",function(req,res,err){
                     console.log("로그인 실패");
                     sess.logined = false;
                     res.send(sess);
+                    //res.end();
             }
+        
+        }
+        else {
+            console.log("회원 정보가 없음.")
+            sess.logined = false;
+            res.send(sess);
+        }
+    });
     
 });
 
@@ -56,4 +86,6 @@ router.delete("/api/logout",function(req,res,err) {
     res.redirect("..");
 });
 
+
+//INSERT INTO `HappyBoardGame`.`MEMBER` (`Member_ID`, `Name`, `Password`, `Authority`) VALUES ('pyi7628', 'YeongIn', '7628', '0');//회원가입
 module.exports = router;
