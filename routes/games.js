@@ -11,9 +11,43 @@ connection.connect(function (err) {
       throw err;   
     } 
 });
+
+router.get("/likes",function(req,res,err){
+    let userID=req.session.userID;
+    connection.query('SELECT * FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.LIKES L  where B.Board_game_ID=L.Board_game_ID and L.Member_ID='+userID, function(err,rows,fields){
+        if(!err){
+
+           var gameResult = JSON.parse(JSON.stringify(rows));
+           
+           res.send(gameResult);
+          
+        }
+        else{
+            console.log(err);
+        }
+    })
+});
+
 //SELECT distinct B.Board_game_ID, B.Title, B.Img_url FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.GENRES G where B.Board_game_ID=G.Board_game_ID and G.Genre in (select Genre from HappyBoardGame.GENRES where Board_game_ID in (select Board_game_ID from HappyBoardGame.LIKES where Member_ID=2))and B.Board_game_ID not in (select Board_game_ID from HappyBoardGame.LIKES where Member_ID=2)
 router.get("/recommand",function(req,res,err){
-    connection.query('SELECT * FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.GENRES G where B.Board_game_ID=G.Board_game_ID and G.Genre in (select Genre from HappyBoardGame.GENRES where Board_game_ID in (select Board_game_ID from HappyBoardGame.LIKES where Member_ID=2))and B.Board_game_ID not in (select Board_game_ID from HappyBoardGame.LIKES where Member_ID=2) group by B.Board_game_ID', function(err,rows,fields){
+    let userID=req.session.userID;
+    connection.query('SELECT * FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.GENRES G where B.Board_game_ID=G.Board_game_ID and G.Genre in (select Genre from HappyBoardGame.GENRES where Board_game_ID in (select Board_game_ID from HappyBoardGame.LIKES where Member_ID='+userID+'))and B.Board_game_ID not in (select Board_game_ID from HappyBoardGame.LIKES where Member_ID='+userID+') group by B.Board_game_ID', function(err,rows,fields){
+        if(!err){
+
+           var gameResult = JSON.parse(JSON.stringify(rows));
+           
+           res.send(gameResult);
+          
+        }
+        else{
+            console.log(err);
+        }
+    })
+});
+
+router.get("/all",function(req,res,err){
+    let userID=req.session.userID;
+    connection.query('SELECT * FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.GENRES G where B.Board_game_ID=G.Board_game_ID group by B.Board_game_ID ', function(err,rows,fields){
         if(!err){
 
            var gameResult = JSON.parse(JSON.stringify(rows));
