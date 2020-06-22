@@ -14,7 +14,7 @@ connection.connect(function (err) {
 
 router.get("/likes",function(req,res,err){
     let userID=req.session.userID;
-    connection.query('SELECT * FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.LIKES L  where B.Board_game_ID=L.Board_game_ID and L.Member_ID='+userID, function(err,rows,fields){
+    connection.query(`SELECT * FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.LIKES L, HappyBoardGame.GENRES G  where B.Board_game_ID=L.Board_game_ID and L.Member_ID=${userID} and B.Board_game_ID=G.Board_game_ID group by B.Board_game_ID`, function(err,rows,fields){
         if(!err){
 
            var gameResult = JSON.parse(JSON.stringify(rows));
