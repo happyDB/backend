@@ -55,7 +55,7 @@ router.post("/api/login",function(req,res,err){
             if(rows.Name == userInfo.id && userInfo.pwd == rows.Password){
                 console.log("로그인 성공");
                 sess.logined = true;
-                sess.id = rows.Member_ID;
+                sess.userID = rows.Member_ID;
                 sess.nickname = rows.Name;
                 sess.authority=rows.Authority;
                 console.log(sess);
