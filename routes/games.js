@@ -44,6 +44,18 @@ router.get("/recommand",function(req,res,err){
         }
     })
 });
+router.get("/manageStore", function(req,res,err){
+    let userID = req.session.userID;
+    console.log(userID)
+    connection.query(`SELECT * FROM HappyBoardGame.STORE S where S.Member_ID = ${userID}`, function(err,rows,fields){
+        if(!err){
+            var store = JSON.parse(JSON.stringify(rows));
+            console.log(store)
+            res.send(store);
+        }
+        else console.log(err);
+    })
+})
 
 router.get("/all",function(req,res,err){
     let userID=req.session.userID;
@@ -217,6 +229,29 @@ router.get("/boardgame/:idx/player",function(req,res,err){
             console.log(err);
         }
     })
+});
+
+router.post("/manageStore", function(req, res, err){
+    var name = req.body.name;
+    var add1 = req.body.add1;
+    var add2 = req.body.add2;
+    var zip = req.body.zip;
+    var number = req.body.number;
+    var open = req.body.open;
+    var close = req.body.close;
+    let userID = req.session.userID;
+
+    connection.query(`INSERT INTO HappyBoardGame.STORE (Name, Add1, Add2, Zip_code, Phone_number, Open_time, Close_time, Member_ID) VALUES ('${name}', '${add1}', '${add2}', '${zip}', '${number}', '${open}', '${close}', '${userID}');` , function(err,rows,fields){
+        if(!err){
+            console.log(rows);
+            res.send(rows);
+        }
+        else{
+            console.log(err);
+        }
+    })
+
+    
 });
 
 router.post("/searchGame", function(req, res, err){
