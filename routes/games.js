@@ -158,6 +158,23 @@ router.get("/boardgame/:idx/review",function(req,res,err){
     })
 });
 
+router.post("/boardgame/:idx/rating",function(req,res,err){
+    var id= req.params.idx;
+    console.log("id in post :"+ id);
+    var rating = req.body.rating;
+    
+
+    connection.query(`UPDATE HappyBoardGame.BOARD_GAME SET Average_rating = '${rating}' WHERE (Board_game_ID = ${id});`, 
+    function(err,rows,fields){
+        if(err){
+            res.send(err);
+            console.log(err);
+        }
+    });
+    res.end();
+});
+
+
 router.post("/boardgame/:idx/review",function(req,res,err){
     var id= req.params.idx;
     console.log("id in post :"+ id);
