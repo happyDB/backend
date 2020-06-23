@@ -282,5 +282,35 @@ router.post("/searchGame", function(req, res, err){
     
 })
 
+//////////////////manage search
+router.post("/manage/search",function(req,res,err){
+    let sName=req.body.content;
+    console.log(sName)
+    connection.query(`SELECT * FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.GENRES G where B.Board_game_ID=G.Board_game_ID and B.Title LIKE '%${sName}%' group by B.Board_game_ID `, function(err,rows,fields){
+        if(!err){
+
+           var gameResult = JSON.parse(JSON.stringify(rows));
+           console.log(gameResult)
+           res.send(gameResult);
+          
+        }
+        else{
+            console.log(err);
+        }
+    })
+});
+
+router.get("/manage/has",function(req,res,err){
+    var id= req.body.userID;
+    connection.query('SELECT *  FROM HappyBoardGame.BOARD_GAME B, HappyBoardGame.HAS H, HappyBoardGame.STORE S   where Board_game_ID='+id, function(err,rows,fields){
+        if(!err){
+           res.send(rows);
+          
+        }
+        else{
+            console.log(err);
+        }
+    })
+});
 module.exports = router;
 
